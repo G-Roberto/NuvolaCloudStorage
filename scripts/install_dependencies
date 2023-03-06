@@ -1,0 +1,17 @@
+#!/bin/bash
+yum update -y
+amazon-linux-extras install -y php8.0 mariadb10.5
+yum install -y httpd
+systemctl start httpd.service
+systemctl enable httpd.service
+systemctl start httpd
+systemctl enable httpd
+usermod -a -G apache ec2-user
+yum install -y git
+sudo php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+sudo php composer-setup.php
+sudo php -r "unlink('composer-setup.php');"
+sudo mv composer.phar /usr/local/bin/composer
+sudo /usr/local/bin/composer require phpmailer/phpmailer
+sudo /usr/local/bin/composer require aws/aws-sdk-php
+sudo mv vendor /usr/local/bin/
