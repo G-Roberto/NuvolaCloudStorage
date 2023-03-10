@@ -68,11 +68,9 @@
         <div class="container px-4 px-lg-5">
             <div class="row gx-4 gx-lg-5 justify-content-center">
                 <div class="col-md-10 col-lg-8 col-xl-7">
-					<!--<div class="d-flex justify-content-end mb-4"><a class="btn btn-secondary text-uppercase" href="profile.php">User: ?php echo $_SESSION['name'];?</a></div>-->
                     <hr class="my-4" />
                     <div class="post-preview">
 						<h2 class="post-title">Contents</h2>
-						<!--<input type="submit" value="Show" id="btn" class="btn btn-primary text-uppercase" onclick="show_contents()">-->
 						<br><p id="msgpar"></p>	
                     </div>
                     <!-- Divider-->
@@ -81,13 +79,11 @@
                     <div class="post-preview" id="app">
 						<div v-if="!image">
 							<a><h2>Upload file</h2></a>
-							<input type="file" class="btn btn-primary text-uppercase" @change="onFileChange">
+							<input type="file" class="btn btn-primary text-uppercase" id="fileInput" />
 						</div>
 						<div v-else>
-							<img :src="image" width="500" />
-							</br>
-							<button v-if="!uploadURL" @click="removeImage" class="btn btn-primary text-uppercase">Remove file</button>
-							<button v-if="!uploadURL" @click="uploadImage" class="btn btn-primary text-uppercase">Upload file</button>
+							<img :src="image" width="500" /></br>
+							<button onclick="uploadFile()" class="btn btn-primary text-uppercase">Upload file</button>
 						</div>
 						<h2 v-if="uploadURL">Success! File uploaded to bucket.</h2>
                     </div>
@@ -137,76 +133,46 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 		
 		<script>
-			const MAX_IMAGE_SIZE = 100000000
-			const API_ENDPOINT = 'https://ciaxap8z77.execute-api.eu-central-1.amazonaws.com/uploads?filename=';
-			const WEBSITE = 'https://sam-app-s3uploadbucket-1ut0y5lkfg694.s3.eu-central-1.amazonaws.com/';
+			function uploadFile() {
+				const file = document.getElementById('fileInput').files[0];
+				const chunkSize = 1024 * 1024; // 1 MB chunks
+				let start = 0;
+				let end = chunkSize;
 
-			new Vue({
-				el: "#app",
-				data: {
-					image: '',
-					uploadURL: '',
-					filename: ''
-				},
-				methods: {
-					onFileChange (e) {
-						let files = e.target.files || e.dataTransfer.files
-						//if (!files.length) return
-						this.createImage(files[0])
-					},
-					createImage (file) {
-						let reader = new FileReader()
-						reader.onload = (e) => {
-							console.log('length: ')
-							// Check if the uploaded file is too big
-							if (e.target.result.length > MAX_IMAGE_SIZE) {
-								return alert('File is loo large.')
+				while (start < file.size) {
+					const chunk = file.slice(start, end);
+					const reader = new FileReader();
+
+					reader.onload = function(event) {
+						const chunkData = new Uint8Array(event.target.result);
+						const xhr = new XMLHttpRequest();
+						xhr.open('POST', 'https://n6pjsuhak0.execute-api.eu-central-1.amazonaws.com/default/upload-item', true);
+						xhr.setRequestHeader('Content-Type', 'application/json');
+
+						xhr.onreadystatechange = function() {
+							if (xhr.readyState === 4) {
+								if (xhr.status === 200) {
+									console.log(`Chunk uploaded successfully: ${xhr.responseText}`);
+								} else {
+									console.error(`Error uploading chunk: ${xhr.responseText}`);
+								}
 							}
-							// Check if the uploaded file is an image
-							let extensionarray = ("gif jpg jpeg png");
-							let nameextension = file.name.split('.').pop();
-							if (extensionarray.includes(nameextension) == false) {
-								return
-							}
-							this.image = e.target.result
-							this.filename = file.name
-						}
-						reader.readAsDataURL(file)
-					},
-					removeImage: function (e) {
-						console.log('Remove clicked')
-						this.image = ''
-						this.filename = ''
-					},
-					uploadImage: async function (e) {
-						console.log('Upload clicked')
-						// Get the pre-signed URL
-						const response = await axios({
-							method: 'GET',
-							url: API_ENDPOINT + "<?php echo $currusername; ?>/" + this.filename
-						})
-						console.log('Response: ', response)
-						console.log('Uploading: ', this.image)
-						let binary = atob(this.image.split(',')[1])
-						let array = []
-						for (var i = 0; i < binary.length; i++) {
-							array.push(binary.charCodeAt(i))
-						}
-						let blobData = new Blob([new Uint8Array(array)])
-						console.log('Uploading to: ', response.uploadURL)
-						const result = await fetch(response.uploadURL, {
-							method: 'PUT',
-							body: blobData
-						})
-						console.log('Result: ', result)
-						// Final URL for the user (doesn't need the query string parameters)
-						this.uploadURL = response.uploadURL.split('?')[0];
-						console.log("usname: " + "<?php echo $currusername; ?>" + "; flname: " + this.filename);
-						//addToDatabase("<?php echo $currusername; ?>", this.filename);
-						window.location.replace("home.php");
-					}
+						};
+
+						const payload = JSON.stringify({
+							fileName: file.name,
+							fileData: Array.from(chunkData),
+						});
+
+						xhr.send(payload);
+					};
+
+					reader.readAsArrayBuffer(chunk);
+
+					start = end;
+					end = start + chunkSize;
 				}
-			})
+			}
 		  
 			
 
@@ -238,7 +204,6 @@
 			
 			
 			function delete_file(name, filename) {
-				//remFromDatabase(name, filename);
 						
 				var requestOptions = {
 					method: 'DELETE',
@@ -251,36 +216,6 @@
 				  .catch(error => console.log('error', error));
 				
 				window.location.replace("home.php");
-			}
-			
-			
-			
-			function addToDatabase(usname, flname) {
-				var requestOptions = {
-				  method: 'POST',
-				  redirect: 'follow'
-				};
-
-                console.log("https://0c3ycouajc.execute-api.eu-central-1.amazonaws.com/default/add-item-to-dynamodb?usname=" + usname + "&flname=" + flname);
-
-                fetch("https://0c3ycouajc.execute-api.eu-central-1.amazonaws.com/default/add-item-to-dynamodb?usname=" + usname + "&flname=" + flname, requestOptions)
-				  .then(response => response.text())
-				  .then(result => console.log(result))
-				  .catch(error => console.log('error', error));
-			}
-			
-			
-			
-			function remFromDatabase(usname, flname) {
-				var requestOptions = {
-				  method: 'GET',
-				  redirect: 'follow'
-				};
-
-				fetch("https://u0sw1444v3.execute-api.eu-central-1.amazonaws.com/default/delete-item-from-dynamodb?usname=" + usname + "&flname=" + flname, requestOptions)
-				  .then(response => response.text())
-				  .then(result => console.log(result))
-				  .catch(error => console.log('error', error));
 			}
 		</script>		
     </body>
