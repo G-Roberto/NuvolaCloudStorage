@@ -202,7 +202,7 @@
 						// Final URL for the user (doesn't need the query string parameters)
 						this.uploadURL = response.uploadURL.split('?')[0];
 						console.log("usname: " + "<?php echo $currusername; ?>" + "; flname: " + this.filename);
-						addToDatabase("<?php echo $currusername; ?>", this.filename);
+						//addToDatabase("<?php echo $currusername; ?>", this.filename);
 						window.location.replace("home.php");
 					}
 				}
