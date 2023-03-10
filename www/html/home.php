@@ -238,7 +238,7 @@
 			
 			
 			function delete_file(name, filename) {
-				remFromDatabase(name, filename);
+				//remFromDatabase(name, filename);
 						
 				var requestOptions = {
 					method: 'DELETE',
