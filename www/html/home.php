@@ -17,20 +17,18 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-	    <script src="https://unpkg.com/vue@1.0.28/dist/vue.js"></script>
-		<script src="https://unpkg.com/axios@0.2.1/dist/axios.min.js"></script>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="Roberto Gentilini" />
         <title>Nuvola Cloud Storage</title>
         <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
-        <!-- Font Awesome icons (free version)-->
+        <!-- Font Awesome icons -->
         <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
         <!-- Google fonts-->
         <link href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css" />
         <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css" />
-        <!-- Core theme CSS (includes Bootstrap)-->
+        <!-- Core theme CSS -->
         <link href="css/styles.css" rel="stylesheet" />
     </head>
     <body onload="javascript:show_contents();">
@@ -75,21 +73,18 @@
                     </div>
                     <!-- Divider-->
                     <hr class="my-4" />
-                    <!-- Post preview-->
+                    <!-- Upload-->
                     <div class="post-preview" id="app">
-						<div v-if="!image">
+						<div>
 							<a><h2>Upload file</h2></a>
 							<input type="file" class="btn btn-primary text-uppercase" id="fileInput" />
 						</div>
-						<div v-else>
-							<img :src="image" width="500" /></br>
+						<div>
 							<button onclick="uploadFile()" class="btn btn-primary text-uppercase">Upload file</button>
 						</div>
-						<h2 v-if="uploadURL">Success! File uploaded to bucket.</h2>
                     </div>
                     <!-- Divider-->
                     <hr class="my-4" />
-                    <!-- Pager-->
                 </div>
             </div>
         </div>
