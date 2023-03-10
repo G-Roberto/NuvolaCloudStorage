@@ -17,6 +17,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
+		<script src="https://sdk.amazonaws.com/js/aws-sdk-2.103.0.min.js"></script>
 	    <script src="https://unpkg.com/vue@1.0.28/dist/vue.js"></script>
 		<script src="https://unpkg.com/axios@0.2.1/dist/axios.min.js"></script>
         <meta charset="utf-8" />
@@ -72,7 +73,8 @@
                     <hr class="my-4" />
                     <div class="post-preview">
 						<h2 class="post-title">Contents</h2>
-						<input type="submit" value="Show" id="btn" class="btn btn-primary text-uppercase" onclick="searchItems('<?php echo $currusername;?>')">
+						<input type="file" id="file-input"></br>
+						<button onclick="uploadFile()">Upload file</button>
 						<br><p id="msgpar"></p>	
                     </div>
                     <!-- Divider-->
@@ -122,19 +124,38 @@
         <!-- Bootstrap core JS-->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 		
-		<script>			
-			function searchItems(name) {
-				var requestOptions = {
-				  method: 'POST',
-				  redirect: 'follow'
-				};
+		<script>
 
-				fetch("https://0c3ycouajc.execute-api.eu-central-1.amazonaws.com/default/add-item-to-dynamodb?usname=Roberto&flname=ae55.jpg", requestOptions)
-				  .then(response => response.text())
-				  .then(result => console.log(result))
-				  .catch(error => console.log('error', error));
-							}
-			
+			function uploadFile() {
+				AWS.config.update({
+					region: 'your-region',
+					accessKeyId: 'your-access-key-id',
+					secretAccessKey: 'your-secret-access-key'
+				});
+
+				const lambda = new AWS.Lambda();
+
+				const file = document.getElementById('file-input').files[0];
+				const reader = new FileReader();
+				reader.readAsArrayBuffer(file);
+				reader.onload = async () => {
+					const arrayBuffer = reader.result;
+					const params = {
+						FunctionName: 'upload-item',
+						Payload: JSON.stringify({
+							headers: {
+								'Content-Type': file.type
+							},
+							queryStringParameters: {
+								uploadId: new Date().getTime().toString()
+							},
+							body: new Uint8Array(arrayBuffer)
+						})
+					};
+					const response = await lambda.invoke(params).promise();
+					console.log(response);
+				};
+			}
 		</script>		
     </body>
 </html>
