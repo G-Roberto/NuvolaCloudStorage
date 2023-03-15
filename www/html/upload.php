@@ -81,7 +81,7 @@
 					<!-- Divider-->
                     <hr class="my-4" />
                     <div class="post-preview">
-						<div class="d-flex justify-content-center mb-4"><a href="contents.php" class="btn btn-primary text-uppercase">Go back to contents</a>
+						<div class="d-flex justify-content-center mb-4"><a href="home.php" class="btn btn-primary text-uppercase">Go back to contents</a>
                     </div>
                     <!-- Divider-->
                     <hr class="my-4" />

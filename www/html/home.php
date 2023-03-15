@@ -75,7 +75,7 @@
 					<!-- Divider-->
                     <hr class="my-4" />
                     <div class="post-preview">
-						<div class="d-flex justify-content-center mb-4"><a href="home.php" class="btn btn-primary text-uppercase">Upload a file</a>
+						<div class="d-flex justify-content-center mb-4"><a href="upload.php" class="btn btn-primary text-uppercase">Upload a file</a>
                     </div>
                     <!-- Divider-->
                     <hr class="my-4" />
