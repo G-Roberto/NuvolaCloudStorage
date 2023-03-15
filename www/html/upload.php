@@ -148,7 +148,7 @@
 							if (xhr.readyState === 4) {
 								if (xhr.status === 200) {
 									console.log(`Chunk uploaded successfully: ${xhr.responseText}`);
-									window.location.replace("home.php");
+									window.location.replace("upload.php");
 								} else {
 									console.error(`Error uploading chunk: ${xhr.responseText}`);
 								}
