@@ -31,7 +31,7 @@
         <!-- Core theme CSS -->
         <link href="css/styles.css" rel="stylesheet" />
     </head>
-    <body>
+    <body onload="javascript:show_contents();">
         <!-- Navigation-->
         <nav class="navbar navbar-expand-lg navbar-light" id="mainNav">
             <div class="container px-4 px-lg-5">
@@ -66,22 +66,16 @@
         <div class="container px-4 px-lg-5">
             <div class="row gx-4 gx-lg-5 justify-content-center">
                 <div class="col-md-10 col-lg-8 col-xl-7">
-                    <!-- Divider-->
+					 <!-- Divider-->
                     <hr class="my-4" />
-                    <!-- Upload-->
-                    <div class="post-preview" id="app">
-						<div>
-							<a><h2>Upload file</h2></a>
-							<input type="file" class="btn btn-primary text-uppercase" id="fileInput" />
-						</div>
-						<div>
-							<button onclick="uploadFile()" class="btn btn-primary text-uppercase">Upload file</button>
-						</div>
+                    <div class="post-preview">
+						<h2 class="post-title">Contents</h2>
+						<br><p id="msgpar"></p>	
                     </div>
 					<!-- Divider-->
                     <hr class="my-4" />
                     <div class="post-preview">
-						<div class="d-flex justify-content-center mb-4"><a href="contents.php" class="btn btn-primary text-uppercase">Go to Contents</a>
+						<div class="d-flex justify-content-center mb-4"><a href="home.php" class="btn btn-primary text-uppercase">Upload a file</a>
                     </div>
                     <!-- Divider-->
                     <hr class="my-4" />
@@ -128,47 +122,44 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 		
 		<script>
-			function uploadFile() {
-				const file = document.getElementById('fileInput').files[0];
-				const chunkSize = 1024 * 1024; // 1 MB chunks
-				let start = 0;
-				let end = chunkSize;
+			function show_contents() {
+				var requestOptions = {
+				  method: 'GET',
+				  redirect: 'follow'
+				};
 
-				while (start < file.size) {
-					const chunk = file.slice(start, end);
-					const reader = new FileReader();
+				name = "<?php echo $currusername ?>";
 
-					reader.onload = function(event) {
-						const chunkData = new Uint8Array(event.target.result);
-						const xhr = new XMLHttpRequest();
-						xhr.open('POST', 'https://n6pjsuhak0.execute-api.eu-central-1.amazonaws.com/default/upload-item', true);
-						xhr.setRequestHeader('Content-Type', 'application/json');
+				fetch("https://j08lhrjnlk.execute-api.eu-central-1.amazonaws.com/default/get-items-in-bucket?searchedname=" + name, requestOptions)
+				  .then(response => response.text())
+				  
+				  .then(result => {
+					console.log(result);
+					var files = result.toString().split('"filename":"');
+					for (let i = files.length - 1; i >= 1; i--) {
+						filename = files[i].split('","')[0];
+						document.getElementById("msgpar").innerHTML = document.getElementById("msgpar").innerHTML + '<br><h4><a href="accessimg.php?' + name + "/" + filename + '">' + filename + '</a></h4> <input type="submit" value="Delete" id="delbtn" onclick="delete_file(' + "'" + name + "', '" + filename + "'" + ')"></br></br>';
+					}
+				  })
+				  
+				  .catch(error => console.log('error', error));
+			}
+			
+			
+						
+			function delete_file(name, filename) {
+						
+				var requestOptions = {
+					method: 'DELETE',
+					redirect: 'follow'
+				};
 
-						xhr.onreadystatechange = function() {
-							if (xhr.readyState === 4) {
-								if (xhr.status === 200) {
-									console.log(`Chunk uploaded successfully: ${xhr.responseText}`);
-									window.location.replace("home.php");
-								} else {
-									console.error(`Error uploading chunk: ${xhr.responseText}`);
-								}
-							}
-						};
-
-						filePath = "<?php echo $currusername; ?>/" + file.name;
-						const payload = JSON.stringify({
-							fileName: filePath,
-							fileData: Array.from(chunkData),
-						});
-
-						xhr.send(payload);
-					};
-
-					reader.readAsArrayBuffer(chunk);
-
-					start = end;
-					end = start + chunkSize;
-				}
+				fetch("https://47ttwbrs8f.execute-api.eu-central-1.amazonaws.com/default/deleteitem?itemKey=" + name + "/" + filename, requestOptions)
+				  .then(response => response.text())
+				  .then(result => console.log(result))
+				  .catch(error => console.log('error', error));
+				
+				window.location.replace("home.php");
 			}
 		</script>		
     </body>
