@@ -1,4 +1,8 @@
 <?php include "../inc/dbinfo.inc"; ?>
+<?php
+	session_start();
+	$errorname = $_SESSION['errorname'];
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -56,7 +60,7 @@
                     <hr class="my-4" />
                     <!-- Upload-->
                     <div class="post-preview" id="app">
-						<h2 class="post-title"><?php echo $_SESSION['errorname'];?></h2>
+						<h2 class="post-title"><?php echo $errorname;?></h2>
                     </div>
 					<!-- Divider-->
                     <hr class="my-4" />
