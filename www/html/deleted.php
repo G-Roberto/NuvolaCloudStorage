@@ -70,7 +70,7 @@
                     <hr class="my-4" />
                     <!-- Upload-->
                     <div class="post-preview" id="app">
-						File deleted succesfully.
+						<h2 class="post-title">File deleted successfully.</h2>
                     </div>
 					<!-- Divider-->
                     <hr class="my-4" />
